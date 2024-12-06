@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>siege.sh</title>
+    <style>
+        :root {
+            --bg-color: #0a0a0a;
+            --text-color: #33ff33;
+            --accent-color: #1a1a1a;
+            --hover-color: #444;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Courier New', monospace;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 800px;
+            padding: 2rem;
+            text-align: center;
+        }
+
+        .glitch {
+            font-size: 3.5rem;
+            font-weight: bold;
+            margin-bottom: 2rem;
+            position: relative;
+            text-shadow: 0.05em 0 0 rgba(255,0,0,0.75),
+                         -0.025em -0.05em 0 rgba(0,255,0,0.75),
+                         0.025em 0.05em 0 rgba(0,0,255,0.75);
+            animation: glitch 500ms infinite;
+        }
+
+        @keyframes glitch {
+            0% {
+                text-shadow: 0.05em 0 0 rgba(255,0,0,0.75),
+                            -0.025em -0.05em 0 rgba(0,255,0,0.75),
+                            0.025em 0.05em 0 rgba(0,0,255,0.75);
+            }
+            14% {
+                text-shadow: 0.05em 0 0 rgba(255,0,0,0.75),
+                            -0.025em -0.05em 0 rgba(0,255,0,0.75),
+                            0.025em 0.05em 0 rgba(0,0,255,0.75);
+            }
+            15% {
+                text-shadow: -0.05em -0.025em 0 rgba(255,0,0,0.75),
+                            0.025em 0.025em 0 rgba(0,255,0,0.75),
+                            -0.05em -0.05em 0 rgba(0,0,255,0.75);
+            }
+            49% {
+                text-shadow: -0.05em -0.025em 0 rgba(255,0,0,0.75),
+                            0.025em 0.025em 0 rgba(0,255,0,0.75),
+                            -0.05em -0.05em 0 rgba(0,0,255,0.75);
+            }
+            50% {
+                text-shadow: 0.025em 0.05em 0 rgba(255,0,0,0.75),
+                            0.05em 0 0 rgba(0,255,0,0.75),
+                            0 -0.05em 0 rgba(0,0,255,0.75);
+            }
+            99% {
+                text-shadow: 0.025em 0.05em 0 rgba(255,0,0,0.75),
+                            0.05em 0 0 rgba(0,255,0,0.75),
+                            0 -0.05em 0 rgba(0,0,255,0.75);
+            }
+            100% {
+                text-shadow: -0.025em 0 0 rgba(255,0,0,0.75),
+                            -0.025em -0.025em 0 rgba(0,255,0,0.75),
+                            -0.025em -0.05em 0 rgba(0,0,255,0.75);
+            }
+        }
+
+        .terminal {
+            background-color: var(--accent-color);
+            padding: 2rem;
+            border-radius: 4px;
+            margin: 2rem 0;
+            text-align: left;
+            position: relative;
+        }
+
+        .terminal::before {
+            content: "$";
+            position: absolute;
+            left: 1rem;
+            color: var(--text-color);
+        }
+
+        .terminal-text {
+            margin-left: 1.5rem;
+            overflow: hidden;
+            white-space: nowrap;
+            animation: typing 3.5s steps(40, end);
+        }
+
+        @keyframes typing {
+            from { width: 0 }
+            to { width: 100% }
+        }
+
+        .status {
+            font-size: 0.9rem;
+            margin-top: 2rem;
+            color: rgba(51, 255, 51, 0.7);
+        }
+
+        .metric {
+            display: inline-block;
+            margin: 1rem;
+            padding: 0.5rem 1rem;
+            background-color: var(--accent-color);
+            border-radius: 4px;
+        }
+
+        .metric:hover {
+            background-color: var(--hover-color);
+            transform: scale(1.05);
+            transition: all 0.3s ease;
+        }
+
+        footer {
+            margin-top: 4rem;
+            font-size: 0.8rem;
+            opacity: 0.7;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="glitch">siege.sh</h1>
+
+        <div class="terminal">
+            <div class="terminal-text">initializing systems...</div>
+        </div>
+
+        <div class="metrics">
+            <div class="metric">
+                <div>UPTIME</div>
+                <div>99.99%</div>
+            </div>
+            <div class="metric">
+                <div>LATENCY</div>
+                <div>0.3ms</div>
+            </div>
+            <div class="metric">
+                <div>NODES</div>
+                <div>████░</div>
+            </div>
+        </div>
+
+        <div class="status">
+            <p>Status: Operational</p>
+            <p>Protocol v2.3.7 Active</p>
+            <p>// Secure Infrastructure Gateway Endpoint</p>
+        </div>
+
+        <footer>
+            <p>&copy; siege.sh</p>
+        </footer>
+    </div>
+</body>
+</html>
