@@ -115,12 +115,20 @@
             color: rgba(51, 255, 51, 0.7);
         }
 
+        .metrics {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
         .metric {
             display: inline-block;
             margin: 1rem;
             padding: 0.5rem 1rem;
             background-color: var(--accent-color);
             border-radius: 4px;
+            min-width: 100px;
         }
 
         .metric:hover {
@@ -151,7 +159,7 @@
             </div>
             <div class="metric">
                 <div>LATENCY</div>
-                <div>0.3ms</div>
+                <div id="latency">measuring...</div>
             </div>
             <div class="metric">
                 <div>NODES</div>
@@ -166,8 +174,52 @@
         </div>
 
         <footer>
-            <p>&copy; siege.sh</p>
+            <p>© 2024 siege.sh</p>
         </footer>
     </div>
+
+    <script>
+        async function measureLatency() {
+            const latencyElement = document.getElementById('latency');
+            const measurements = [];
+            const measurementCount = 5;
+
+            for (let i = 0; i < measurementCount; i++) {
+                const start = performance.now();
+                try {
+                    const response = await fetch(window.location.href, {
+                        method: 'HEAD',
+                        cache: 'no-store'
+                    });
+                    const end = performance.now();
+                    measurements.push(end - start);
+                } catch (error) {
+                    console.error('Latency measurement failed:', error);
+                }
+
+                // Small delay between measurements
+                await new Promise(resolve => setTimeout(resolve, 200));
+            }
+
+            if (measurements.length > 0) {
+                // Calculate average latency, removing highest and lowest values if we have enough measurements
+                measurements.sort((a, b) => a - b);
+                const trimmedMeasurements = measurements.length >= 4
+                    ? measurements.slice(1, -1)
+                    : measurements;
+
+                const avgLatency = trimmedMeasurements.reduce((a, b) => a + b, 0) / trimmedMeasurements.length;
+                latencyElement.textContent = `${Math.round(avgLatency)}ms`;
+            } else {
+                latencyElement.textContent = 'error';
+            }
+        }
+
+        // Initial measurement
+        measureLatency();
+
+        // Periodic measurement every 10 seconds
+        setInterval(measureLatency, 10000);
+    </script>
 </body>
 </html>
