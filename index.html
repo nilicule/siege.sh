@@ -88,6 +88,8 @@
             margin: 2rem 0;
             text-align: left;
             position: relative;
+            height: 200px;
+            overflow-y: hidden;
         }
 
         .terminal::before {
@@ -99,14 +101,19 @@
 
         .terminal-text {
             margin-left: 1.5rem;
-            overflow: hidden;
-            white-space: nowrap;
-            animation: typing 3.5s steps(40, end);
+            white-space: pre-line;
+            animation: fadeIn 0.5s ease-in;
         }
 
-        @keyframes typing {
-            from { width: 0 }
-            to { width: 100% }
+        .terminal-line {
+            margin-bottom: 0.5rem;
+            opacity: 0;
+            animation: fadeIn 0.5s ease-in forwards;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         .status {
@@ -137,10 +144,31 @@
             transition: all 0.3s ease;
         }
 
+        .nodes-progress {
+            letter-spacing: 2px;
+            transition: all 0.3s ease;
+        }
+
         footer {
             margin-top: 4rem;
             font-size: 0.8rem;
             opacity: 0.7;
+        }
+
+        .technical-stats {
+            font-size: 0.8rem;
+            text-align: left;
+            margin-top: 2rem;
+            padding: 1rem;
+            background-color: var(--accent-color);
+            border-radius: 4px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            margin-top: 1rem;
         }
     </style>
 </head>
@@ -149,7 +177,7 @@
         <h1 class="glitch">siege.sh</h1>
 
         <div class="terminal">
-            <div class="terminal-text">initializing systems...</div>
+            <div class="terminal-text" id="terminal-output"></div>
         </div>
 
         <div class="metrics">
@@ -163,7 +191,19 @@
             </div>
             <div class="metric">
                 <div>NODES</div>
-                <div>████░</div>
+                <div id="nodes-progress" class="nodes-progress">░░░░░</div>
+            </div>
+        </div>
+
+        <div class="technical-stats">
+            <div>System Diagnostics:</div>
+            <div class="stats-grid">
+                <div>Memory Pool: <span id="memory-usage">calculating...</span></div>
+                <div>Thread Count: <span id="thread-count">calculating...</span></div>
+                <div>Cache Hit Ratio: <span id="cache-ratio">calculating...</span></div>
+                <div>Network I/O: <span id="network-io">calculating...</span></div>
+                <div>Active Shards: <span id="active-shards">calculating...</span></div>
+                <div>Quantum State: <span id="quantum-state">calculating...</span></div>
             </div>
         </div>
 
@@ -171,6 +211,7 @@
             <p>Status: Operational</p>
             <p>Protocol v2.3.7 Active</p>
             <p>// Secure Infrastructure Gateway Endpoint</p>
+            <p id="runtime-flags"></p>
         </div>
 
         <footer>
@@ -179,6 +220,74 @@
     </div>
 
     <script>
+        const terminalMessages = [
+            "initializing system kernel...",
+            "loading security modules...",
+            "establishing quantum tunnels...",
+            "calibrating node matrix...",
+            "synchronizing distributed cache...",
+            "enabling neural protocols...",
+            "validating encryption layers...",
+            "system ready."
+        ];
+
+        const terminalOutput = document.getElementById('terminal-output');
+        let messageIndex = 0;
+
+        function addTerminalLine(message) {
+            const line = document.createElement('div');
+            line.className = 'terminal-line';
+            line.textContent = message;
+            terminalOutput.appendChild(line);
+            terminalOutput.scrollTop = terminalOutput.scrollHeight;
+        }
+
+        function updateTerminal() {
+            if (messageIndex < terminalMessages.length) {
+                addTerminalLine(terminalMessages[messageIndex]);
+                messageIndex++;
+                setTimeout(updateTerminal, 1000);
+            }
+        }
+
+        // Start terminal animation
+        updateTerminal();
+
+        // Nodes progress animation
+        const nodesProgress = document.getElementById('nodes-progress');
+        let nodeCount = 0;
+
+        function updateNodes() {
+            if (nodeCount < 5) {
+                const progress = '█'.repeat(nodeCount + 1) + '░'.repeat(4 - nodeCount);
+                nodesProgress.textContent = progress;
+                nodeCount++;
+                setTimeout(updateNodes, 1500);
+            }
+        }
+
+        // Start nodes animation
+        setTimeout(updateNodes, 3000);
+
+        // Technical stats updates
+        function updateTechnicalStats() {
+            document.getElementById('memory-usage').textContent = `${Math.floor(Math.random() * 20 + 80)}% optimal`;
+            document.getElementById('thread-count').textContent = `${Math.floor(Math.random() * 100 + 900)} active`;
+            document.getElementById('cache-ratio').textContent = `${(Math.random() * 0.1 + 0.89).toFixed(3)}`;
+            document.getElementById('network-io').textContent = `${Math.floor(Math.random() * 500 + 500)}MB/s`;
+            document.getElementById('active-shards').textContent = `${Math.floor(Math.random() * 5 + 15)}/20`;
+            document.getElementById('quantum-state').textContent = `stable (${(Math.random() * 0.02 + 0.98).toFixed(3)})`;
+        }
+
+        // Update technical stats periodically
+        setInterval(updateTechnicalStats, 2000);
+        updateTechnicalStats();
+
+        // Runtime flags
+        const flags = ['-secure', '-distributed', '-quantum', '-neural'];
+        document.getElementById('runtime-flags').textContent =
+            `Runtime Flags: ${flags.join(' ')}`;
+
         async function measureLatency() {
             const latencyElement = document.getElementById('latency');
             const measurements = [];
@@ -197,12 +306,10 @@
                     console.error('Latency measurement failed:', error);
                 }
 
-                // Small delay between measurements
                 await new Promise(resolve => setTimeout(resolve, 200));
             }
 
             if (measurements.length > 0) {
-                // Calculate average latency, removing highest and lowest values if we have enough measurements
                 measurements.sort((a, b) => a - b);
                 const trimmedMeasurements = measurements.length >= 4
                     ? measurements.slice(1, -1)
