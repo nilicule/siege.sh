@@ -74,7 +74,7 @@ const CommandProcessor = {
                 const fileContents = {
                     'readme.md': 'Welcome to my terminal portfolio! Type "help" to see available commands.',
                     'profile.txt': 'This is a simulated file system. Try exploring with ls and cat commands.',
-                    'contact.info': 'Email: contact@siege.sh\nGitHub: https://github.com/nilicule\nTwitter: https://x.com/nilicule',
+                    'contact.info': 'Email: info@siege.sh\nGitHub: https://github.com/nilicule\nTwitter: https://x.com/nilicule',
                     'resume.pdf': '[This would be a PDF file in a real system]'
                 };
 
