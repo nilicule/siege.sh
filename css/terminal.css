@@ -1,0 +1,128 @@
+.terminal {
+    width: 100%;
+    height: 100vh;
+    margin: 0;
+    padding: 20px;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    /* Hide scrollbar for different browsers */
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* IE and Edge */
+}
+
+/* Hide scrollbar for Chrome, Safari and Opera */
+.terminal::-webkit-scrollbar {
+    display: none;
+}
+
+.terminal-header {
+    padding-bottom: 10px;
+    margin-bottom: 15px;
+    font-size: 14px;
+    color: var(--text-color);
+    line-height: 1.6;
+}
+
+.output {
+    margin-bottom: 10px;
+    white-space: pre-wrap;
+}
+
+.command-result {
+    padding-left: 15px;
+    margin-bottom: 10px;
+}
+
+.prompt {
+    display: flex;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.prompt-text {
+    color: var(--prompt-color);
+    margin-right: 15px;
+}
+
+.input-line {
+    display: flex;
+    align-items: center;
+}
+
+#command-input {
+    background: transparent;
+    border: none;
+    color: var(--text-color);
+    font-family: 'Courier New', monospace;
+    font-size: 16px;
+    outline: none;
+    width: 100%;
+    caret-color: var(--accent-color);
+}
+
+.blink {
+    animation: blink-animation 1s steps(2, start) infinite;
+}
+
+@keyframes blink-animation {
+    to {
+        visibility: hidden;
+    }
+}
+
+/* Command output styles */
+.help-section h2, .projects-list h2, .skills-list h2 {
+    color: var(--accent-color);
+    margin-bottom: 8px;
+}
+
+.command-list {
+    margin-left: 15px;
+    margin-bottom: 15px;
+}
+
+.command-item {
+    display: flex;
+    margin-bottom: 3px;
+}
+
+.command-name {
+    width: 120px;
+    color: var(--success-color);
+}
+
+.command-description {
+    flex: 1;
+}
+
+.contact-info {
+    margin-top: 8px;
+}
+
+.projects-list, .skills-list {
+    margin-left: 15px;
+    margin-bottom: 15px;
+}
+
+.project-item, .skill-item {
+    margin-bottom: 10px;
+}
+
+.project-title, .skill-category {
+    color: var(--success-color);
+    font-weight: bold;
+}
+
+.project-description {
+    margin-left: 15px;
+    margin-top: 3px;
+}
+
+.skill-items {
+    margin-left: 15px;
+    margin-top: 3px;
+}
+
+.social-links {
+    margin-top: 8px;
+}

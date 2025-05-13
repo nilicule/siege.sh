@@ -3,330 +3,50 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>siege.sh</title>
-    <style>
-        :root {
-            --bg-color: #0a0a0a;
-            --text-color: #33ff33;
-            --accent-color: #1a1a1a;
-            --hover-color: #444;
-        }
-
-        body {
-            margin: 0;
-            padding: 0;
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            font-family: 'Courier New', monospace;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            line-height: 1.6;
-        }
-
-        .container {
-            max-width: 800px;
-            padding: 2rem;
-            text-align: center;
-        }
-
-        .glitch {
-            font-size: 3.5rem;
-            font-weight: bold;
-            margin-bottom: 2rem;
-            position: relative;
-            text-shadow: 0.05em 0 0 rgba(255,0,0,0.75),
-                         -0.025em -0.05em 0 rgba(0,255,0,0.75),
-                         0.025em 0.05em 0 rgba(0,0,255,0.75);
-            animation: glitch 500ms infinite;
-        }
-
-        @keyframes glitch {
-            0% {
-                text-shadow: 0.05em 0 0 rgba(255,0,0,0.75),
-                            -0.025em -0.05em 0 rgba(0,255,0,0.75),
-                            0.025em 0.05em 0 rgba(0,0,255,0.75);
-            }
-            14% {
-                text-shadow: 0.05em 0 0 rgba(255,0,0,0.75),
-                            -0.025em -0.05em 0 rgba(0,255,0,0.75),
-                            0.025em 0.05em 0 rgba(0,0,255,0.75);
-            }
-            15% {
-                text-shadow: -0.05em -0.025em 0 rgba(255,0,0,0.75),
-                            0.025em 0.025em 0 rgba(0,255,0,0.75),
-                            -0.05em -0.05em 0 rgba(0,0,255,0.75);
-            }
-            49% {
-                text-shadow: -0.05em -0.025em 0 rgba(255,0,0,0.75),
-                            0.025em 0.025em 0 rgba(0,255,0,0.75),
-                            -0.05em -0.05em 0 rgba(0,0,255,0.75);
-            }
-            50% {
-                text-shadow: 0.025em 0.05em 0 rgba(255,0,0,0.75),
-                            0.05em 0 0 rgba(0,255,0,0.75),
-                            0 -0.05em 0 rgba(0,0,255,0.75);
-            }
-            99% {
-                text-shadow: 0.025em 0.05em 0 rgba(255,0,0,0.75),
-                            0.05em 0 0 rgba(0,255,0,0.75),
-                            0 -0.05em 0 rgba(0,0,255,0.75);
-            }
-            100% {
-                text-shadow: -0.025em 0 0 rgba(255,0,0,0.75),
-                            -0.025em -0.025em 0 rgba(0,255,0,0.75),
-                            -0.025em -0.05em 0 rgba(0,0,255,0.75);
-            }
-        }
-
-        .terminal {
-            background-color: var(--accent-color);
-            padding: 2rem;
-            border-radius: 4px;
-            margin: 2rem 0;
-            text-align: left;
-            position: relative;
-            height: 200px;
-            overflow-y: hidden;
-        }
-
-        .terminal::before {
-            content: "$";
-            position: absolute;
-            left: 1rem;
-            color: var(--text-color);
-        }
-
-        .terminal-text {
-            margin-left: 1.5rem;
-            white-space: pre-line;
-            animation: fadeIn 0.5s ease-in;
-        }
-
-        .terminal-line {
-            margin-bottom: 0.5rem;
-            opacity: 0;
-            animation: fadeIn 0.5s ease-in forwards;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .status {
-            font-size: 0.9rem;
-            margin-top: 2rem;
-            color: rgba(51, 255, 51, 0.7);
-        }
-
-        .metrics {
-            display: flex;
-            justify-content: center;
-            flex-wrap: wrap;
-            gap: 1rem;
-        }
-
-        .metric {
-            display: inline-block;
-            margin: 1rem;
-            padding: 0.5rem 1rem;
-            background-color: var(--accent-color);
-            border-radius: 4px;
-            min-width: 100px;
-        }
-
-        .metric:hover {
-            background-color: var(--hover-color);
-            transform: scale(1.05);
-            transition: all 0.3s ease;
-        }
-
-        .nodes-progress {
-            letter-spacing: 2px;
-            transition: all 0.3s ease;
-        }
-
-        footer {
-            margin-top: 4rem;
-            font-size: 0.8rem;
-            opacity: 0.7;
-        }
-
-        .technical-stats {
-            font-size: 0.8rem;
-            text-align: left;
-            margin-top: 2rem;
-            padding: 1rem;
-            background-color: var(--accent-color);
-            border-radius: 4px;
-        }
-
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 1rem;
-            margin-top: 1rem;
-        }
-    </style>
+    <title>siege.sh - Terminal Portfolio</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/terminal.css">
 </head>
 <body>
-    <div class="container">
-        <h1 class="glitch">siege.sh</h1>
-
-        <div class="terminal">
-            <div class="terminal-text" id="terminal-output"></div>
+    <div class="terminal">
+        <div class="terminal-header">
+            <pre style="line-height: 1.1; margin-bottom: 10px; color: var(--success-color);">
+ ██████  ██▓▓█████   ▄████ ▓█████      ██████  ██░ ██
+▒██    ▒ ▓██▒▓█   ▀  ██▒ ▀█▒▓█   ▀    ▒██    ▒ ▓██░ ██▒
+░ ▓██▄   ▒██▒▒███   ▒██░▄▄▄░▒███      ░ ▓██▄   ▒██▀▀██░
+  ▒   ██▒░██░▒▓█  ▄ ░▓█  ██▓▒▓█  ▄      ▒   ██▒░▓█ ░██
+▒██████▒▒░██░░▒████▒░▒▓███▀▒░▒████▒   ▒██████▒▒░▓█▒░██▓
+▒ ▒▓▒ ▒ ░░▓  ░░ ▒░ ░ ░▒   ▒ ░░ ▒░ ░   ▒ ▒▓▒ ▒ ░ ▒ ░░▒░▒
+░ ░▒  ░ ░ ▒ ░ ░ ░  ░  ░   ░  ░ ░  ░   ░ ░▒  ░ ░ ▒ ░▒░ ░
+░  ░  ░   ▒ ░   ░   ░ ░   ░    ░      ░  ░  ░   ░  ░░ ░
+      ░   ░     ░  ░      ░    ░  ░         ░   ░  ░  ░
+            </pre>
+            Welcome to <span style="color: #f0f6fc; font-weight: bold;">siege.sh</span> 1.0.0 LTS
+            <br>
+            * GitHub: <a href="https://github.com/nilicule" target="_blank">https://github.com/nilicule</a>
+            <br>
+            * X / Twitter: <a href="https://x.com/nilicule" target="_blank">https://x.com/nilicule</a>
+            <br>
+            * This terminal hates being squished. Deploy a bigger screen.
         </div>
 
-        <div class="metrics">
-            <div class="metric">
-                <div>UPTIME</div>
-                <div>99.99%</div>
-            </div>
-            <div class="metric">
-                <div>LATENCY</div>
-                <div id="latency">measuring...</div>
-            </div>
-            <div class="metric">
-                <div>NODES</div>
-                <div id="nodes-progress" class="nodes-progress">░░░░░</div>
-            </div>
+        <div id="terminal-output">
+            <div class="output">Last login: <span id="current-date"></span></div>
+            <div class="output">Type 'help' to see available commands.</div>
         </div>
 
-        <div class="technical-stats">
-            <div>System Diagnostics:</div>
-            <div class="stats-grid">
-                <div>Memory Pool: <span id="memory-usage">calculating...</span></div>
-                <div>Thread Count: <span id="thread-count">calculating...</span></div>
-                <div>Cache Hit Ratio: <span id="cache-ratio">calculating...</span></div>
-                <div>Network I/O: <span id="network-io">calculating...</span></div>
-                <div>Active Shards: <span id="active-shards">calculating...</span></div>
-                <div>Quantum State: <span id="quantum-state">calculating...</span></div>
-            </div>
+        <div class="input-line">
+            <div class="prompt-text" style="display: inline-block; width: 185px;">nilicule@siege.sh:~$</div>
+            <input type="text" id="command-input" autofocus spellcheck="false">
         </div>
-
-        <div class="status">
-            <p>Status: Operational</p>
-            <p>Protocol v2.3.7 Active</p>
-            <p>// Secure Infrastructure Gateway Endpoint</p>
-            <p id="runtime-flags"></p>
-        </div>
-
-        <footer>
-            <p>© 2024 siege.sh</p>
-        </footer>
     </div>
 
-    <script>
-        const terminalMessages = [
-            "initializing system kernel...",
-            "loading security modules...",
-            "establishing quantum tunnels...",
-            "calibrating node matrix...",
-            "synchronizing distributed cache...",
-            "enabling neural protocols...",
-            "validating encryption layers...",
-            "system ready."
-        ];
+    <!-- Command templates will be loaded dynamically -->
+    <div id="templates-container" class="hidden"></div>
 
-        const terminalOutput = document.getElementById('terminal-output');
-        let messageIndex = 0;
-
-        function addTerminalLine(message) {
-            const line = document.createElement('div');
-            line.className = 'terminal-line';
-            line.textContent = message;
-            terminalOutput.appendChild(line);
-            terminalOutput.scrollTop = terminalOutput.scrollHeight;
-        }
-
-        function updateTerminal() {
-            if (messageIndex < terminalMessages.length) {
-                addTerminalLine(terminalMessages[messageIndex]);
-                messageIndex++;
-                setTimeout(updateTerminal, 1000);
-            }
-        }
-
-        // Start terminal animation
-        updateTerminal();
-
-        // Nodes progress animation
-        const nodesProgress = document.getElementById('nodes-progress');
-        let nodeCount = 0;
-
-        function updateNodes() {
-            if (nodeCount < 5) {
-                const progress = '█'.repeat(nodeCount + 1) + '░'.repeat(4 - nodeCount);
-                nodesProgress.textContent = progress;
-                nodeCount++;
-                setTimeout(updateNodes, 1500);
-            }
-        }
-
-        // Start nodes animation
-        setTimeout(updateNodes, 3000);
-
-        // Technical stats updates
-        function updateTechnicalStats() {
-            document.getElementById('memory-usage').textContent = `${Math.floor(Math.random() * 20 + 80)}% optimal`;
-            document.getElementById('thread-count').textContent = `${Math.floor(Math.random() * 100 + 900)} active`;
-            document.getElementById('cache-ratio').textContent = `${(Math.random() * 0.1 + 0.89).toFixed(3)}`;
-            document.getElementById('network-io').textContent = `${Math.floor(Math.random() * 500 + 500)}MB/s`;
-            document.getElementById('active-shards').textContent = `${Math.floor(Math.random() * 5 + 15)}/20`;
-            document.getElementById('quantum-state').textContent = `stable (${(Math.random() * 0.02 + 0.98).toFixed(3)})`;
-        }
-
-        // Update technical stats periodically
-        setInterval(updateTechnicalStats, 2000);
-        updateTechnicalStats();
-
-        // Runtime flags
-        const flags = ['-secure', '-distributed', '-quantum', '-neural'];
-        document.getElementById('runtime-flags').textContent =
-            `Runtime Flags: ${flags.join(' ')}`;
-
-        async function measureLatency() {
-            const latencyElement = document.getElementById('latency');
-            const measurements = [];
-            const measurementCount = 5;
-
-            for (let i = 0; i < measurementCount; i++) {
-                const start = performance.now();
-                try {
-                    const response = await fetch(window.location.href, {
-                        method: 'HEAD',
-                        cache: 'no-store'
-                    });
-                    const end = performance.now();
-                    measurements.push(end - start);
-                } catch (error) {
-                    console.error('Latency measurement failed:', error);
-                }
-
-                await new Promise(resolve => setTimeout(resolve, 200));
-            }
-
-            if (measurements.length > 0) {
-                measurements.sort((a, b) => a - b);
-                const trimmedMeasurements = measurements.length >= 4
-                    ? measurements.slice(1, -1)
-                    : measurements;
-
-                const avgLatency = trimmedMeasurements.reduce((a, b) => a + b, 0) / trimmedMeasurements.length;
-                latencyElement.textContent = `${Math.round(avgLatency)}ms`;
-            } else {
-                latencyElement.textContent = 'error';
-            }
-        }
-
-        // Initial measurement
-        measureLatency();
-
-        // Periodic measurement every 10 seconds
-        setInterval(measureLatency, 10000);
-    </script>
+    <script src="js/utils.js"></script>
+    <script src="js/terminal.js"></script>
+    <script src="js/commands.js"></script>
+    <script src="js/main.js"></script>
 </body>
 </html>

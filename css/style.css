@@ -1,0 +1,49 @@
+:root {
+    --bg-color: #0d1117;
+    --text-color: #e6edf3;
+    --accent-color: #58a6ff;
+    --success-color: #3fb950;
+    --error-color: #f85149;
+    --prompt-color: #7ee787;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+html, body {
+    height: 100%;
+    width: 100%;
+    overflow: hidden;
+}
+
+body {
+    font-family: 'Courier New', monospace;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    line-height: 1.2;
+    padding: 0;
+    margin: 0;
+    min-height: 100vh;
+}
+
+a {
+    color: var(--accent-color);
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+.hidden {
+    display: none;
+}
+
+@media (max-width: 768px) {
+    .terminal {
+        padding: 15px;
+    }
+}
