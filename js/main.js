@@ -14,6 +14,11 @@ document.addEventListener('DOMContentLoaded', function() {
     // Display a random ASCII art logo
     const logoContainer = document.getElementById('logo-container');
     if (logoContainer && Logos) {
+        // Add overflow handling to prevent scrolling issues
+        logoContainer.style.overflow = 'hidden';
+        logoContainer.style.maxWidth = '100%';
+        logoContainer.style.whiteSpace = 'pre';
+        // Set the logo text
         logoContainer.textContent = Logos.getRandomLogo();
     }
 
