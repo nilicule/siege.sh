@@ -11,6 +11,12 @@ document.addEventListener('DOMContentLoaded', function() {
         'whoami'
     ]);
 
+    // Display a random ASCII art logo
+    const logoContainer = document.getElementById('logo-container');
+    if (logoContainer && Logos) {
+        logoContainer.textContent = Logos.getRandomLogo();
+    }
+
     // Set current date and time
     const now = new Date();
     const options = {
