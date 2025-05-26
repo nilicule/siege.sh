@@ -3,31 +3,31 @@ const CommandProcessor = {
     commands: {
         'help': {
             description: 'Display help information',
-            execute: function() {
+            execute: function () {
                 return document.getElementById('help-template').innerHTML;
             }
         },
         'projects': {
             description: 'List my projects',
-            execute: function() {
+            execute: function () {
                 return document.getElementById('projects-template').innerHTML;
             }
         },
         'contact': {
             description: 'Get my contact information',
-            execute: function() {
+            execute: function () {
                 return document.getElementById('contact-template').innerHTML;
             }
         },
         'about': {
             description: 'Show information about me',
-            execute: function() {
+            execute: function () {
                 return document.getElementById('about-template').innerHTML;
             }
         },
         'whoami': {
             description: 'Reveal your mysterious digital persona',
-            execute: function() {
+            execute: function () {
                 const template = document.getElementById('whoami-template').innerHTML;
                 const resultElement = document.createElement('div');
                 resultElement.innerHTML = template;
@@ -43,14 +43,14 @@ const CommandProcessor = {
         },
         'clear': {
             description: 'Clear the terminal screen',
-            execute: function() {
+            execute: function () {
                 Terminal.clear();
                 return null;
             }
         },
         'ls': {
             description: 'List simulated directory contents',
-            execute: function() {
+            execute: function () {
                 const files = [
                     '<span style="color: #4e94ce;">projects/</span>',
                     '<span style="color: #4e94ce;">documents/</span>',
@@ -65,7 +65,7 @@ const CommandProcessor = {
         },
         'cat': {
             description: 'Display content of simulated files',
-            execute: function(args) {
+            execute: function (args) {
                 const fileName = args ? args.trim() : '';
                 if (!fileName) {
                     return '<div class="output" style="color: var(--error-color);">Usage: cat [filename]</div>';
@@ -88,14 +88,14 @@ const CommandProcessor = {
         },
         'echo': {
             description: 'Display a line of text',
-            execute: function(args) {
+            execute: function (args) {
                 const text = args ? args : '';
                 return `<div class="output">${text}</div>`;
             }
         },
         'date': {
             description: 'Display the current date and time',
-            execute: function() {
+            execute: function () {
                 const now = new Date();
                 const options = {
                     weekday: 'short',
@@ -110,9 +110,73 @@ const CommandProcessor = {
                 return `<div class="output">${now.toLocaleDateString('en-US', options)}</div>`;
             }
         },
+        // Add this inside the commands object
+        'matrix': {
+            description: 'Trigger Matrix falling code effect',
+            execute: function () {
+                // Prevent multiple overlays
+                if (document.getElementById('matrix-canvas')) return '<div class="output">Matrix effect already running.</div>';
+
+                const container = document.getElementById('terminal-container') || document.body;
+                const canvas = document.createElement('canvas');
+                canvas.id = 'matrix-canvas';
+                canvas.style.position = 'fixed';
+                canvas.style.top = 0;
+                canvas.style.left = 0;
+                canvas.style.width = '100vw';
+                canvas.style.height = '100vh';
+                canvas.style.pointerEvents = 'none';
+                canvas.style.zIndex = 9999;
+                container.appendChild(canvas);
+
+                const ctx = canvas.getContext('2d');
+                let width = window.innerWidth;
+                let height = window.innerHeight;
+                canvas.width = width;
+                canvas.height = height;
+
+                const letters = 'アァカサタナハマヤャラワガザダバパイィキシチニヒミリヰギジヂビピウゥクスツヌフムユュルグズヅブプエェケセテネヘメレヱゲゼデベペオォコソトノホモヨョロヲゴゾドボポヴッンABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+                const fontSize = 18;
+                const columns = Math.floor(width / fontSize);
+                const drops = Array(columns).fill(1);
+
+                function draw() {
+                    ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+                    ctx.fillRect(0, 0, width, height);
+                    ctx.fillStyle = '#0F0';
+                    ctx.font = fontSize + 'px monospace';
+                    for (let i = 0; i < drops.length; i++) {
+                        const text = letters.charAt(Math.floor(Math.random() * letters.length));
+                        ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+                        if (drops[i] * fontSize > height && Math.random() > 0.975) {
+                            drops[i] = 0;
+                        }
+                        drops[i]++;
+                    }
+                }
+
+                let interval = setInterval(draw, 33);
+
+                // Remove effect after 10 seconds
+                setTimeout(() => {
+                    clearInterval(interval);
+                    canvas.remove();
+                }, 10000);
+
+                // Adjust canvas on resize
+                window.addEventListener('resize', function onResize() {
+                    width = window.innerWidth;
+                    height = window.innerHeight;
+                    canvas.width = width;
+                    canvas.height = height;
+                });
+
+                return '<div class="output">Welcome to the Matrix...</div>';
+            }
+        },
         'fortune': {
             description: 'Display a random fortune',
-            execute: function() {
+            execute: function () {
                 const fortunes = [
                     "You will find a hidden treasure where you least expect it.",
                     "A journey of a thousand miles begins with a single step.",
@@ -131,7 +195,7 @@ const CommandProcessor = {
         },
         'cowsay': {
             description: 'Display an ASCII cow with a message',
-            execute: function(args) {
+            execute: function (args) {
                 const message = args ? args : 'Moo!';
                 const messageLength = message.length;
                 const border = '-'.repeat(messageLength + 2);
@@ -150,7 +214,7 @@ const CommandProcessor = {
         },
         'sl': {
             description: 'Display an ASCII train animation',
-            execute: function() {
+            execute: function () {
                 const train = `
       ====        ________                ___________
   _D _|  |_______/        \\__I_I_____===__|_________|
@@ -168,7 +232,7 @@ __/ =| o |=-~~\\  /~~\\  /~~\\  /~~\\ ____Y___________|__|______________________
         },
         'figlet': {
             description: 'Display text in ASCII art',
-            execute: function(args) {
+            execute: function (args) {
                 const text = args ? args : 'Hello!';
                 // Simple ASCII art for common letters
                 const asciiArt = {
@@ -200,7 +264,7 @@ __/ =| o |=-~~\\  /~~\\  /~~\\  /~~\\ ____Y___________|__|______________________
         },
         'rev': {
             description: 'Reverse a string',
-            execute: function(args) {
+            execute: function (args) {
                 const text = args ? args : '';
                 const reversed = text.split('').reverse().join('');
                 return `<div class="output">${reversed}</div>`;
@@ -208,11 +272,11 @@ __/ =| o |=-~~\\  /~~\\  /~~\\  /~~\\ ____Y___________|__|______________________
         },
         'lolcat': {
             description: 'Display text in rainbow colors',
-            execute: function(args) {
+            execute: function (args) {
                 const text = args ? args : 'Rainbow Text';
                 let coloredText = '';
                 const colors = [
-                    '#ff0000', '#ff7f00', '#ffff00', '#00ff00', 
+                    '#ff0000', '#ff7f00', '#ffff00', '#00ff00',
                     '#0000ff', '#4b0082', '#9400d3'
                 ];
 
@@ -226,7 +290,7 @@ __/ =| o |=-~~\\  /~~\\  /~~\\  /~~\\ ____Y___________|__|______________________
         },
         'neofetch': {
             description: 'Display system information in a stylized format',
-            execute: function() {
+            execute: function () {
                 // Get OS information
                 const userAgent = navigator.userAgent;
                 let osName = "Unknown OS";
@@ -345,7 +409,7 @@ $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
         }
     },
 
-    process: function(commandInput) {
+    process: function (commandInput) {
         // Split the input into command and arguments
         const parts = commandInput.split(' ');
         const command = parts[0];
@@ -361,12 +425,12 @@ $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
         }
     },
 
-    getAvailableCommands: function() {
+    getAvailableCommands: function () {
         return Object.keys(this.commands);
     },
 
     // Method to register new commands
-    register: function(name, description, executeFunction) {
+    register: function (name, description, executeFunction) {
         this.commands[name] = {
             description: description,
             execute: executeFunction
