@@ -208,6 +208,153 @@ const CommandProcessor = {
                 return `<div class="output">Opening <a href="${content.trim()}" target="_blank" style="color: var(--accent-color);">${content.trim()}</a>...</div>`;
             }
         },
+        'ping': {
+            description: 'Ping a host and measure round-trip time',
+            execute: function (args) {
+                if (!args) return '<div class="output" style="color: var(--error-color);">Usage: ping [host]</div>';
+
+                const host = args.trim();
+                const url = host.startsWith('http') ? host : 'https://' + host;
+                const rtts = [];
+                let sent = 0;
+
+                Terminal.displayResult(`<div class="output">PING ${host}: 56 data bytes</div>`);
+
+                function sendPing(seq) {
+                    const start = performance.now();
+                    fetch(url, { mode: 'no-cors', cache: 'no-store' })
+                        .then(() => {
+                            const rtt = (performance.now() - start).toFixed(1);
+                            rtts.push(parseFloat(rtt));
+                            Terminal.displayResult(`<div class="output">64 bytes from ${host}: icmp_seq=${seq} ttl=64 time=${rtt} ms</div>`);
+                        })
+                        .catch(() => {
+                            Terminal.displayResult(`<div class="output" style="color: var(--error-color);">Request timeout for icmp_seq=${seq}</div>`);
+                        })
+                        .finally(() => {
+                            sent++;
+                            if (sent < 4) {
+                                setTimeout(() => sendPing(sent), 300);
+                            } else {
+                                setTimeout(() => {
+                                    Terminal.displayResult(`<div class="output">--- ${host} ping statistics ---</div>`);
+                                    if (rtts.length > 0) {
+                                        const min = Math.min(...rtts).toFixed(1);
+                                        const max = Math.max(...rtts).toFixed(1);
+                                        const avg = (rtts.reduce((a, b) => a + b) / rtts.length).toFixed(1);
+                                        const loss = (((4 - rtts.length) / 4) * 100).toFixed(0);
+                                        Terminal.displayResult(`<div class="output">4 packets transmitted, ${rtts.length} received, ${loss}% packet loss</div>`);
+                                        Terminal.displayResult(`<div class="output">round-trip min/avg/max = ${min}/${avg}/${max} ms</div>`);
+                                    } else {
+                                        Terminal.displayResult(`<div class="output" style="color: var(--error-color);">4 packets transmitted, 0 received, 100% packet loss</div>`);
+                                    }
+                                }, 200);
+                            }
+                        });
+                }
+
+                setTimeout(() => sendPing(0), 100);
+                return null;
+            }
+        },
+        'traceroute': {
+            description: 'Trace the route to a host',
+            execute: function (args) {
+                if (!args) return '<div class="output" style="color: var(--error-color);">Usage: traceroute [host]</div>';
+
+                const host = args.trim();
+                const silentHops = new Set([3, 6]);
+                const fakeIps = [
+                    '192.168.1.1', '10.0.0.1', null,
+                    '72.14.215.165', '108.170.246.1', null,
+                    '209.85.255.136', host
+                ];
+
+                Terminal.displayResult(`<div class="output">traceroute to ${host}, 30 hops max, 60 byte packets</div>`);
+
+                fakeIps.forEach((ip, idx) => {
+                    const hop = idx + 1;
+                    setTimeout(() => {
+                        if (silentHops.has(hop)) {
+                            Terminal.displayResult(`<div class="output">${String(hop).padStart(2)}  * * *</div>`);
+                        } else {
+                            const base = 2 + hop * 5 + Math.random() * 4;
+                            const t1 = base.toFixed(1);
+                            const t2 = (base - Math.random() * 0.5).toFixed(1);
+                            const t3 = (base + Math.random() * 1.5).toFixed(1);
+                            Terminal.displayResult(`<div class="output">${String(hop).padStart(2)}  ${ip}  ${t1} ms  ${t2} ms  ${t3} ms</div>`);
+                        }
+                    }, 150 * (hop + 1));
+                });
+
+                return null;
+            }
+        },
+        'curl': {
+            description: 'Transfer data from a URL',
+            execute: function (args) {
+                if (!args) return '<div class="output" style="color: var(--error-color);">Usage: curl [url]</div>';
+
+                const url = args.trim();
+                if (!url.startsWith('http://') && !url.startsWith('https://')) {
+                    return '<div class="output" style="color: var(--error-color);">curl: URL must start with http:// or https://</div>';
+                }
+
+                let host;
+                try {
+                    host = new URL(url).hostname;
+                } catch (e) {
+                    return `<div class="output" style="color: var(--error-color);">curl: (3) URL malformed: ${url}</div>`;
+                }
+
+                Terminal.displayResult(`<div class="output">* Trying ${host}...<br>* Connected to ${host} port ${url.startsWith('https') ? 443 : 80}<br>&gt; GET / HTTP/1.1<br>&gt; Host: ${host}<br>&gt; User-Agent: curl/7.88.1<br>&gt; Accept: */*<br>&gt;</div>`);
+
+                fetch(url)
+                    .then(response => {
+                        let headersHtml = `&lt; HTTP/${response.status >= 200 ? '2' : '1.1'} ${response.status} ${response.statusText || ''}<br>`;
+                        response.headers.forEach((value, name) => {
+                            headersHtml += `&lt; ${name}: ${value}<br>`;
+                        });
+                        headersHtml += '&lt;<br>[Response body omitted]';
+                        Terminal.displayResult(`<div class="output">${headersHtml}</div>`);
+                    })
+                    .catch(() => {
+                        Terminal.displayResult(`<div class="output" style="color: var(--error-color);">curl: (6) Could not resolve host: ${host}</div>`);
+                    });
+
+                return null;
+            }
+        },
+        'ifconfig': {
+            description: 'Display network interface configuration',
+            execute: function () {
+                const lastOctet = Math.floor(Math.random() * 253) + 2;
+                const mac = Array.from({ length: 6 }, () =>
+                    Math.floor(Math.random() * 256).toString(16).padStart(2, '0')
+                ).join(':');
+
+                let connectionInfo = '';
+                const conn = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+                if (conn) {
+                    const parts = [];
+                    if (conn.effectiveType) parts.push(`type: ${conn.effectiveType}`);
+                    if (conn.downlink) parts.push(`downlink: ${conn.downlink} Mbps`);
+                    if (conn.rtt) parts.push(`rtt: ${conn.rtt} ms`);
+                    if (parts.length) connectionInfo = `\n      ${parts.join('  ')}`;
+                }
+
+                const output = `lo0: flags=8049&lt;UP,LOOPBACK,RUNNING,MULTICAST&gt; mtu 16384
+      inet 127.0.0.1 netmask 0xff000000
+
+eth0: flags=8863&lt;UP,BROADCAST,SMART,RUNNING,SIMPLEX,MULTICAST&gt; mtu 1500
+      inet 192.168.1.${lastOctet} netmask 0xffffff00 broadcast 192.168.1.255
+      ether ${mac}
+      media: autoselect (1000baseT &lt;full-duplex&gt;)
+      status: active${connectionInfo}`;
+
+                return `<div class="output"><pre>${output}</pre></div>`;
+            }
+        },
         'echo': {
             description: 'Display a line of text',
             execute: function (args) {
