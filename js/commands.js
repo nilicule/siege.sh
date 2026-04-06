@@ -17,10 +17,10 @@ const FileSystem = {
         },
         '~/projects': {
             items: [
-                '<span style="color: #42a647;">beats.rc6.org.link</span>',
-                '<span style="color: #42a647;">n2g.dev.link</span>',
-                '<span style="color: #42a647;">nilicule.com.link</span>',
-                '<span style="color: #42a647;">rc6.org.link</span>'
+                '<span style="color: #58a6ff;">beats.rc6.org.link</span>',
+                '<span style="color: #58a6ff;">n2g.dev.link</span>',
+                '<span style="color: #58a6ff;">nilicule.com.link</span>',
+                '<span style="color: #58a6ff;">rc6.org.link</span>'
             ],
             subdirs: []
         },
@@ -39,6 +39,39 @@ const FileSystem = {
             ],
             subdirs: []
         }
+    },
+
+    files: {
+        'readme.md': 'Welcome to my terminal portfolio! Type "help" to see available commands.',
+        'profile.txt': 'This is a simulated file system. Try exploring with ls and cat commands.',
+        'contact.info': 'Email: info@siege.sh\nGitHub: https://github.com/nilicule\nTwitter: https://x.com/nilicule',
+        'resume.pdf': '[This would be a PDF file in a real system]',
+        'documents/resume.pdf': '[This would be a PDF file in a real system]',
+        'documents/notes.txt': 'Remember to update portfolio with latest projects.\nLook into new side project ideas.\nDeploy siege.sh v2.',
+        'projects/beats.rc6.org.link': 'https://beats.rc6.org',
+        'projects/n2g.dev.link': 'https://n2g.dev',
+        'projects/nilicule.com.link': 'https://nilicule.com',
+        'projects/rc6.org.link': 'https://rc6.org',
+        'images/profile.png': `
+    +-------+
+   /  ^   ^  \\
+  | (o) (o) |
+  |    <>    |
+  |  \\____/  |
+   \\         /
+    +---------+
+  nilicule, developer`,
+        'images/logo.png': `
+ ___  _  ___  ___  ___
+/ __|| || __|/ __|| __|
+\\__ \\| || _|| (_ || _|
+|___/|_||___|\\___|\\___| .sh`,
+        'images/screenshot.png': `
++-------------------------------+
+| nilicule@siege.sh:~$ ls      |
+| projects/ documents/ images/ |
+| nilicule@siege.sh:~$         |
++-------------------------------+`
     }
 };
 
@@ -108,43 +141,9 @@ const CommandProcessor = {
                     return '<div class="output" style="color: var(--error-color);">Usage: cat [filename]</div>';
                 }
 
-                const fileContents = {
-                    'readme.md': 'Welcome to my terminal portfolio! Type "help" to see available commands.',
-                    'profile.txt': 'This is a simulated file system. Try exploring with ls and cat commands.',
-                    'contact.info': 'Email: info@siege.sh\nGitHub: https://github.com/nilicule\nTwitter: https://x.com/nilicule',
-                    'resume.pdf': '[This would be a PDF file in a real system]',
-                    'documents/resume.pdf': '[This would be a PDF file in a real system]',
-                    'documents/notes.txt': 'Remember to update portfolio with latest projects.\nLook into new side project ideas.\nDeploy siege.sh v2.',
-                    'projects/beats.rc6.org.link': 'https://beats.rc6.org',
-                    'projects/n2g.dev.link': 'https://n2g.dev',
-                    'projects/nilicule.com.link': 'https://nilicule.com',
-                    'projects/rc6.org.link': 'https://rc6.org',
-                    'images/profile.png': `
-    +-------+
-   /  ^   ^  \\
-  | (o) (o) |
-  |    <>    |
-  |  \\____/  |
-   \\         /
-    +---------+
-  nilicule, developer`,
-                    'images/logo.png': `
- ___  _  ___  ___  ___
-/ __|| || __|/ __|| __|
-\\__ \\| || _|| (_ || _|
-|___/|_||___|\\___|\\___| .sh`,
-                    'images/screenshot.png': `
-+-------------------------------+
-| nilicule@siege.sh:~$ ls      |
-| projects/  documents/  images/|
-| nilicule@siege.sh:~$ help    |
-| > type a command to begin... |
-+-------------------------------+`
-                };
-
                 const subdir = FileSystem.currentPath === '~' ? '' : FileSystem.currentPath.replace('~/', '') + '/';
                 const lookupKey = subdir + fileName.toLowerCase();
-                const content = fileContents[lookupKey];
+                const content = FileSystem.files[lookupKey];
                 if (content) {
                     return `<div class="output">${content.replace(/\n/g, '<br>')}</div>`;
                 } else {
@@ -183,6 +182,30 @@ const CommandProcessor = {
             execute: function () {
                 const full = FileSystem.currentPath.replace('~', '/home/nilicule');
                 return `<div class="output">${full}</div>`;
+            }
+        },
+        'open': {
+            description: 'Open a .link file in a new tab',
+            execute: function (args) {
+                const fileName = args ? args.trim() : '';
+                if (!fileName) {
+                    return '<div class="output" style="color: var(--error-color);">Usage: open [filename]</div>';
+                }
+
+                const subdir = FileSystem.currentPath === '~' ? '' : FileSystem.currentPath.replace('~/', '') + '/';
+                const lookupKey = subdir + fileName.toLowerCase();
+                const content = FileSystem.files[lookupKey];
+
+                if (!content) {
+                    return `<div class="output" style="color: var(--error-color);">open: ${fileName}: No such file</div>`;
+                }
+
+                if (!fileName.endsWith('.link')) {
+                    return `<div class="output" style="color: var(--error-color);">open: ${fileName}: Not a link file</div>`;
+                }
+
+                window.open(content.trim(), '_blank');
+                return `<div class="output">Opening <a href="${content.trim()}" target="_blank" style="color: var(--accent-color);">${content.trim()}</a>...</div>`;
             }
         },
         'echo': {
