@@ -73,15 +73,27 @@ const Terminal = {
                 this.input.value = '';
             }
         } else if (e.key === 'Tab') {
-            // Simple tab completion
             e.preventDefault();
-            const availableCommands = CommandProcessor.getAvailableCommands();
-            const input = this.input.value.trim().toLowerCase();
+            const input = this.input.value;
+            const parts = input.trimStart().split(' ');
 
-            if (input) {
-                const match = availableCommands.find(cmd => cmd.startsWith(input));
-                if (match) {
-                    this.input.value = match;
+            if (parts.length === 1) {
+                // Complete command name
+                const partial = parts[0].toLowerCase();
+                if (partial) {
+                    const match = CommandProcessor.getAvailableCommands().find(cmd => cmd.startsWith(partial));
+                    if (match) this.input.value = match;
+                }
+            } else {
+                // Complete filename in current directory
+                const cmd = parts[0];
+                const partial = parts[parts.length - 1].toLowerCase();
+                const dir = FileSystem.directories[FileSystem.currentPath];
+                if (dir && partial) {
+                    // Extract plain filenames from the HTML items
+                    const names = dir.items.map(item => item.replace(/<[^>]+>/g, ''));
+                    const match = names.find(name => name.toLowerCase().startsWith(partial));
+                    if (match) this.input.value = cmd + ' ' + match;
                 }
             }
         }

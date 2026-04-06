@@ -154,7 +154,7 @@ const CommandProcessor = {
         'cd': {
             description: 'Change directory',
             execute: function (args) {
-                const target = args ? args.trim() : '';
+                const target = args ? args.trim().replace(/\/$/, '') : '';
 
                 if (target === '' || target === '~') {
                     FileSystem.currentPath = '~';
