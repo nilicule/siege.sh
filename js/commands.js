@@ -1,3 +1,47 @@
+// Virtual filesystem state
+const FileSystem = {
+    currentPath: '~',
+
+    directories: {
+        '~': {
+            items: [
+                '<span style="color: #4e94ce;">projects/</span>',
+                '<span style="color: #4e94ce;">documents/</span>',
+                '<span style="color: #4e94ce;">images/</span>',
+                '<span style="color: #42a647;">README.md</span>',
+                '<span style="color: #42a647;">profile.txt</span>',
+                '<span style="color: #42a647;">contact.info</span>',
+                '<span style="color: #42a647;">resume.pdf</span>'
+            ],
+            subdirs: ['projects', 'documents', 'images']
+        },
+        '~/projects': {
+            items: [
+                '<span style="color: #42a647;">beats.rc6.org.link</span>',
+                '<span style="color: #42a647;">n2g.dev.link</span>',
+                '<span style="color: #42a647;">nilicule.com.link</span>',
+                '<span style="color: #42a647;">rc6.org.link</span>'
+            ],
+            subdirs: []
+        },
+        '~/documents': {
+            items: [
+                '<span style="color: #42a647;">resume.pdf</span>',
+                '<span style="color: #42a647;">notes.txt</span>'
+            ],
+            subdirs: []
+        },
+        '~/images': {
+            items: [
+                '<span style="color: #42a647;">profile.png</span>',
+                '<span style="color: #42a647;">logo.png</span>',
+                '<span style="color: #42a647;">screenshot.png</span>'
+            ],
+            subdirs: []
+        }
+    }
+};
+
 // Command processor
 const CommandProcessor = {
     commands: {
@@ -49,18 +93,11 @@ const CommandProcessor = {
             }
         },
         'ls': {
-            description: 'List simulated directory contents',
+            description: 'List directory contents',
             execute: function () {
-                const files = [
-                    '<span style="color: #4e94ce;">projects/</span>',
-                    '<span style="color: #4e94ce;">documents/</span>',
-                    '<span style="color: #4e94ce;">images/</span>',
-                    '<span style="color: #42a647;">README.md</span>',
-                    '<span style="color: #42a647;">profile.txt</span>',
-                    '<span style="color: #42a647;">contact.info</span>',
-                    '<span style="color: #42a647;">resume.pdf</span>'
-                ];
-                return `<div class="output">${files.join('&nbsp;&nbsp;&nbsp;')}</div>`;
+                const dir = FileSystem.directories[FileSystem.currentPath];
+                if (!dir) return '<div class="output" style="color: var(--error-color);">ls: cannot access directory</div>';
+                return `<div class="output">${dir.items.join('&nbsp;&nbsp;&nbsp;')}</div>`;
             }
         },
         'cat': {
@@ -75,15 +112,77 @@ const CommandProcessor = {
                     'readme.md': 'Welcome to my terminal portfolio! Type "help" to see available commands.',
                     'profile.txt': 'This is a simulated file system. Try exploring with ls and cat commands.',
                     'contact.info': 'Email: info@siege.sh\nGitHub: https://github.com/nilicule\nTwitter: https://x.com/nilicule',
-                    'resume.pdf': '[This would be a PDF file in a real system]'
+                    'resume.pdf': '[This would be a PDF file in a real system]',
+                    'documents/resume.pdf': '[This would be a PDF file in a real system]',
+                    'documents/notes.txt': 'Remember to update portfolio with latest projects.\nLook into new side project ideas.\nDeploy siege.sh v2.',
+                    'projects/beats.rc6.org.link': 'https://beats.rc6.org',
+                    'projects/n2g.dev.link': 'https://n2g.dev',
+                    'projects/nilicule.com.link': 'https://nilicule.com',
+                    'projects/rc6.org.link': 'https://rc6.org',
+                    'images/profile.png': `
+    +-------+
+   /  ^   ^  \\
+  | (o) (o) |
+  |    <>    |
+  |  \\____/  |
+   \\         /
+    +---------+
+  nilicule, developer`,
+                    'images/logo.png': `
+ ___  _  ___  ___  ___
+/ __|| || __|/ __|| __|
+\\__ \\| || _|| (_ || _|
+|___/|_||___|\\___|\\___| .sh`,
+                    'images/screenshot.png': `
++-------------------------------+
+| nilicule@siege.sh:~$ ls      |
+| projects/  documents/  images/|
+| nilicule@siege.sh:~$ help    |
+| > type a command to begin... |
++-------------------------------+`
                 };
 
-                const content = fileContents[fileName.toLowerCase()];
+                const subdir = FileSystem.currentPath === '~' ? '' : FileSystem.currentPath.replace('~/', '') + '/';
+                const lookupKey = subdir + fileName.toLowerCase();
+                const content = fileContents[lookupKey];
                 if (content) {
                     return `<div class="output">${content.replace(/\n/g, '<br>')}</div>`;
                 } else {
                     return `<div class="output" style="color: var(--error-color);">cat: ${fileName}: No such file or directory</div>`;
                 }
+            }
+        },
+        'cd': {
+            description: 'Change directory',
+            execute: function (args) {
+                const target = args ? args.trim() : '';
+
+                if (target === '' || target === '~') {
+                    FileSystem.currentPath = '~';
+                    return null;
+                }
+
+                if (target === '..') {
+                    if (FileSystem.currentPath !== '~') {
+                        FileSystem.currentPath = '~';
+                    }
+                    return null;
+                }
+
+                const newPath = FileSystem.currentPath + '/' + target;
+                if (FileSystem.directories[newPath]) {
+                    FileSystem.currentPath = newPath;
+                    return null;
+                } else {
+                    return `<div class="output" style="color: var(--error-color);">cd: ${target}: No such file or directory</div>`;
+                }
+            }
+        },
+        'pwd': {
+            description: 'Print working directory',
+            execute: function () {
+                const full = FileSystem.currentPath.replace('~', '/home/nilicule');
+                return `<div class="output">${full}</div>`;
             }
         },
         'echo': {

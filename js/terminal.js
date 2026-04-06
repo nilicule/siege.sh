@@ -43,6 +43,12 @@ const Terminal = {
                 // Process command
                 CommandProcessor.process(command);
 
+                // Update live prompt to reflect current directory
+                const promptEl = document.getElementById('input-prompt');
+                if (promptEl && typeof FileSystem !== 'undefined') {
+                    promptEl.textContent = `nilicule@siege.sh:${FileSystem.currentPath}$`;
+                }
+
                 // Clear input
                 this.input.value = '';
 
@@ -84,7 +90,8 @@ const Terminal = {
     displayCommand: function(command) {
         const commandElement = document.createElement('div');
         commandElement.classList.add('output');
-        commandElement.innerHTML = `<span class="prompt-text" style="display: inline-block; width: 185px;">nilicule@siege.sh:~$</span>${command}`;
+        const currentPath = (typeof FileSystem !== 'undefined') ? FileSystem.currentPath : '~';
+        commandElement.innerHTML = `<span class="prompt-text">nilicule@siege.sh:${currentPath}$</span>${command}`;
         this.output.appendChild(commandElement);
     },
 
