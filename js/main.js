@@ -22,6 +22,10 @@ document.addEventListener('DOMContentLoaded', function() {
         logoContainer.textContent = Logos.getRandomLogo();
     }
 
+    // Set version banner
+    const versionEl = document.getElementById('siege-version');
+    if (versionEl) versionEl.textContent = SIEGE_VERSION;
+
     // Set current date and time
     const now = new Date();
     const options = {

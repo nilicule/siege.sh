@@ -1,3 +1,5 @@
+const SIEGE_VERSION = '1.0.1 LTS';
+
 // Virtual filesystem state
 const FileSystem = {
     currentPath: '~',
@@ -127,8 +129,17 @@ const CommandProcessor = {
         },
         'ls': {
             description: 'List directory contents',
-            execute: function () {
-                const dir = FileSystem.directories[FileSystem.currentPath];
+            execute: function (args) {
+                let targetPath = FileSystem.currentPath;
+                if (args && args.trim()) {
+                    const target = args.trim().replace(/\/$/, '');
+                    const resolved = FileSystem.currentPath === '~' ? '~/' + target : FileSystem.currentPath + '/' + target;
+                    if (!FileSystem.directories[resolved]) {
+                        return `<div class="output" style="color: var(--error-color);">ls: cannot access '${target}': No such file or directory</div>`;
+                    }
+                    targetPath = resolved;
+                }
+                const dir = FileSystem.directories[targetPath];
                 if (!dir) return '<div class="output" style="color: var(--error-color);">ls: cannot access directory</div>';
                 return `<div class="output">${dir.items.join('&nbsp;&nbsp;&nbsp;')}</div>`;
             }
@@ -182,6 +193,39 @@ const CommandProcessor = {
             execute: function () {
                 const full = FileSystem.currentPath.replace('~', '/home/nilicule');
                 return `<div class="output">${full}</div>`;
+            }
+        },
+        'uname': {
+            description: 'Print system information',
+            execute: function (args) {
+                const release = SIEGE_VERSION.toLowerCase().replace(' ', '-');
+                const info = {
+                    s: 'Linux',
+                    n: 'siege.sh',
+                    r: release,
+                    v: `#1 SMP siege.sh ${SIEGE_VERSION}`,
+                    m: 'x86_64',
+                    o: 'GNU/Linux'
+                };
+
+                const flags = args ? args.trim() : '';
+
+                if (!flags) return `<div class="output">${info.s}</div>`;
+
+                if (flags === '-a') {
+                    return `<div class="output">${info.s} ${info.n} ${info.r} ${info.v} ${info.m} ${info.o}</div>`;
+                }
+
+                const flagMap = { '-s': 's', '-n': 'n', '-r': 'r', '-v': 'v', '-m': 'm', '-o': 'o' };
+                const parts = flags.split(/\s+/).map(f => {
+                    if (!flagMap[f]) return { error: f };
+                    return info[flagMap[f]];
+                });
+
+                const error = parts.find(p => p && p.error);
+                if (error) return `<div class="output" style="color: var(--error-color);">uname: invalid option -- '${error.error}'</div>`;
+
+                return `<div class="output">${parts.join(' ')}</div>`;
             }
         },
         'open': {
