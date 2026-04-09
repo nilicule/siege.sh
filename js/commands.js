@@ -339,23 +339,25 @@ const CommandProcessor = {
             execute: function (args) {
                 if (!args) return '<div class="output" style="color: var(--error-color);">Usage: curl [url]</div>';
 
-                const url = args.trim();
-                if (!url.startsWith('http://') && !url.startsWith('https://')) {
-                    return '<div class="output" style="color: var(--error-color);">curl: URL must start with http:// or https://</div>';
+                let rawUrl = args.trim();
+                if (!rawUrl.startsWith('http://') && !rawUrl.startsWith('https://')) {
+                    rawUrl = 'https://' + rawUrl;
                 }
 
-                let host;
+                let host, url;
                 try {
+                    url = rawUrl;
                     host = new URL(url).hostname;
                 } catch (e) {
-                    return `<div class="output" style="color: var(--error-color);">curl: (3) URL malformed: ${url}</div>`;
+                    return `<div class="output" style="color: var(--error-color);">curl: (3) URL malformed: ${rawUrl}</div>`;
                 }
 
-                Terminal.displayResult(`<div class="output">* Trying ${host}...<br>* Connected to ${host} port ${url.startsWith('https') ? 443 : 80}<br>&gt; GET / HTTP/1.1<br>&gt; Host: ${host}<br>&gt; User-Agent: curl/7.88.1<br>&gt; Accept: */*<br>&gt;</div>`);
+                const port = url.startsWith('https') ? 443 : 80;
+                Terminal.displayResult(`<div class="output">* Trying ${host}...<br>* Connected to ${host} port ${port}<br>&gt; GET / HTTP/1.1<br>&gt; Host: ${host}<br>&gt; User-Agent: curl/7.88.1<br>&gt; Accept: */*<br>&gt;</div>`);
 
                 fetch(url)
                     .then(response => {
-                        let headersHtml = `&lt; HTTP/${response.status >= 200 ? '2' : '1.1'} ${response.status} ${response.statusText || ''}<br>`;
+                        let headersHtml = `&lt; HTTP/2 ${response.status} ${response.statusText || ''}<br>`;
                         response.headers.forEach((value, name) => {
                             headersHtml += `&lt; ${name}: ${value}<br>`;
                         });
@@ -363,7 +365,14 @@ const CommandProcessor = {
                         Terminal.displayResult(`<div class="output">${headersHtml}</div>`);
                     })
                     .catch(() => {
-                        Terminal.displayResult(`<div class="output" style="color: var(--error-color);">curl: (6) Could not resolve host: ${host}</div>`);
+                        // CORS may have blocked — confirm host is reachable with no-cors
+                        fetch(url, { mode: 'no-cors' })
+                            .then(() => {
+                                Terminal.displayResult(`<div class="output">&lt; HTTP/2 200<br>&lt; [Headers not available — CORS policy]<br>&lt;<br>[Response body omitted]</div>`);
+                            })
+                            .catch(() => {
+                                Terminal.displayResult(`<div class="output" style="color: var(--error-color);">curl: (6) Could not resolve host: ${host}</div>`);
+                            });
                     });
 
                 return null;
